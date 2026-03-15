@@ -19,7 +19,7 @@ export default function AdminAppointments() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const data = await fetch('/api/appointments').then(r => r.json())
+    const data = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/appointments').then(r => r.json())
     setAppointments(Array.isArray(data) ? data.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) : [])
     setLoading(false)
   }

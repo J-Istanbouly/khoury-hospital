@@ -32,7 +32,7 @@ export default function AdminDoctors() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const [d, dep] = await Promise.all([fetch('/api/doctors').then(r => r.json()), fetch('/api/departments').then(r => r.json())])
+    const [d, dep] = await Promise.all([fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/doctors').then(r => r.json()), fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/departments').then(r => r.json())])
     setDoctors(Array.isArray(d) ? d : [])
     setDepartments(Array.isArray(dep) ? dep : [])
     setLoading(false)
@@ -73,7 +73,7 @@ export default function AdminDoctors() {
     if (!imageFile) return form.image_url || ''
     const fd = new FormData()
     fd.append('file', imageFile)
-    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    const res = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/upload', { method: 'POST', body: fd })
     if (!res.ok) return form.image_url || ''
     const data = await res.json()
     return data.url || ''
@@ -86,7 +86,7 @@ export default function AdminDoctors() {
     if (editing) {
       await fetch(`/api/doctors/${editing.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     } else {
-      await fetch('/api/doctors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/doctors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     }
     setSaving(false); setShowModal(false); fetchAll()
   }

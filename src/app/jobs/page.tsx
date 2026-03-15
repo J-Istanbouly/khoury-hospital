@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 async function getJobs() {
   try {
-    const res = await fetch('/api/jobs', { cache: 'no-store' })
+    const res = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/jobs', { cache: 'no-store' })
     if (!res.ok) return []
     const data = await res.json()
     return Array.isArray(data) ? data.filter((j: any) => j.is_active !== false) : []

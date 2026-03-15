@@ -17,14 +17,14 @@ export default function AdminTestimonials() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const data = await fetch('/api/testimonials').then(r => r.json())
+    const data = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/testimonials').then(r => r.json())
     setItems(Array.isArray(data) ? data : [])
     setLoading(false)
   }
 
   const handleSave = async () => {
     setSaving(true)
-    await fetch('/api/testimonials', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+    await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/testimonials', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
     setSaving(false); setShowModal(false); setForm({ patient_name: '', content: '', rating: 5, department: '', is_published: true }); fetchAll()
   }
 

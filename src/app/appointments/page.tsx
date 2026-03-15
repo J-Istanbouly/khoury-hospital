@@ -3,8 +3,8 @@ import AppointmentForm from '@/components/AppointmentForm'
 
 async function getData() {
   const [doctorsRes, deptsRes] = await Promise.all([
-    fetch('/api/doctors', { cache: 'no-store' }),
-    fetch('/api/departments', { cache: 'no-store' }),
+    fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/doctors', { cache: 'no-store' }),
+    fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/departments', { cache: 'no-store' }),
   ])
   const doctors = await doctorsRes.json()
   const departments = await deptsRes.json()

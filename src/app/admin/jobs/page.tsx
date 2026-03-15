@@ -20,7 +20,7 @@ export default function AdminJobs() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const data = await fetch('/api/jobs').then(r => r.json())
+    const data = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/jobs').then(r => r.json())
     setJobs(Array.isArray(data) ? data : [])
     setLoading(false)
   }
@@ -33,7 +33,7 @@ export default function AdminJobs() {
     if (editing) {
       await fetch(`/api/jobs/${editing.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
     } else {
-      await fetch('/api/jobs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+      await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/jobs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
     }
     setSaving(false); setShowModal(false); fetchAll()
   }

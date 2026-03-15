@@ -2,7 +2,7 @@ import Link from 'next/link'
 import DepartmentsFilter from '@/components/DepartmentsFilter'
 
 async function getDepartments() {
-  const res = await fetch('/api/departments', { cache: 'no-store' })
+  const res = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/departments', { cache: 'no-store' })
   const data = await res.json()
   return Array.isArray(data) ? data : []
 }

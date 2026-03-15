@@ -28,7 +28,7 @@ export default function AdminDepartments() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const data = await fetch('/api/departments').then(r => r.json())
+    const data = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/departments').then(r => r.json())
     setDepartments(Array.isArray(data) ? data : [])
     setLoading(false)
   }
@@ -39,7 +39,7 @@ export default function AdminDepartments() {
   const uploadImage = async () => {
     if (!imageFile) return form.image_url || ''
     const fd = new FormData(); fd.append('file', imageFile)
-    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    const res = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/upload', { method: 'POST', body: fd })
     if (!res.ok) return form.image_url || ''
     const data = await res.json(); return data.url || ''
   }
@@ -51,7 +51,7 @@ export default function AdminDepartments() {
     if (editing) {
       await fetch(`/api/departments/${editing.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     } else {
-      await fetch('/api/departments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/departments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     }
     setSaving(false); setShowModal(false); fetchAll()
   }

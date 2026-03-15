@@ -9,7 +9,7 @@ export default function AdminContacts() {
 
   useEffect(() => {
     if (!localStorage.getItem('isAdmin')) { router.push('/admin/login'); return }
-    fetch('/api/contact').then(r => r.json()).then(data => {
+    fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/contact').then(r => r.json()).then(data => {
       setContacts(Array.isArray(data) ? data.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) : [])
       setLoading(false)
     })

@@ -42,7 +42,7 @@ export default function AdminHeroSlides() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const data = await fetch('/api/hero-slides').then(r => r.json())
+    const data = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/hero-slides').then(r => r.json())
     setSlides(Array.isArray(data) ? data.sort((a: any, b: any) => (a.order_num || 0) - (b.order_num || 0)) : [])
     setLoading(false)
   }
@@ -94,7 +94,7 @@ export default function AdminHeroSlides() {
   const uploadMedia = async () => {
     if (!mediaFile) return form.media_url || ''
     const fd = new FormData(); fd.append('file', mediaFile)
-    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    const res = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/upload', { method: 'POST', body: fd })
     if (!res.ok) return form.media_url || ''
     const data = await res.json(); return data.url || ''
   }
@@ -106,7 +106,7 @@ export default function AdminHeroSlides() {
     if (editing) {
       await fetch(`/api/hero-slides/${editing.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     } else {
-      await fetch('/api/hero-slides', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/hero-slides', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     }
     setSaving(false); setShowModal(false); fetchAll()
   }

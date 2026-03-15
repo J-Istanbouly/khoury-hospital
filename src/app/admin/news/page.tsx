@@ -23,7 +23,7 @@ export default function AdminNews() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const data = await fetch('/api/news').then(r => r.json())
+    const data = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/news').then(r => r.json())
     setNews(Array.isArray(data) ? data : [])
     setLoading(false)
   }
@@ -34,7 +34,7 @@ export default function AdminNews() {
   const uploadImage = async () => {
     if (!imageFile) return form.image_url || ''
     const fd = new FormData(); fd.append('file', imageFile)
-    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    const res = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/upload', { method: 'POST', body: fd })
     if (!res.ok) return form.image_url || ''
     const data = await res.json(); return data.url || ''
   }
@@ -46,7 +46,7 @@ export default function AdminNews() {
     if (editing) {
       await fetch(`/api/news/${editing.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     } else {
-      await fetch('/api/news', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/news', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     }
     setSaving(false); setShowModal(false); fetchAll()
   }

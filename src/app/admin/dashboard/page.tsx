@@ -18,11 +18,11 @@ export default function Dashboard() {
 
   const fetchStats = async () => {
     const [doctors, departments, appointments, news, jobs] = await Promise.all([
-      fetch('/api/doctors').then(r => r.json()),
-      fetch('/api/departments').then(r => r.json()),
-      fetch('/api/appointments').then(r => r.json()),
-      fetch('/api/news').then(r => r.json()),
-      fetch('/api/jobs').then(r => r.json()),
+      fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/doctors').then(r => r.json()),
+      fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/departments').then(r => r.json()),
+      fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/appointments').then(r => r.json()),
+      fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/news').then(r => r.json()),
+      fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/jobs').then(r => r.json()),
     ])
     setStats({
       doctors: Array.isArray(doctors) ? doctors.length : 0,

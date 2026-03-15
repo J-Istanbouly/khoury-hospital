@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 async function getNews() {
-  const res = await fetch('http://localhost:3000/api/news', { cache: 'no-store' })
+  const res = await fetch('/api/news', { cache: 'no-store' })
   const data = await res.json()
   return Array.isArray(data) ? data.filter((n: any) => n.is_published !== false) : []
 }

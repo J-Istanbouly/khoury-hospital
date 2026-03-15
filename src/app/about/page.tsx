@@ -2,7 +2,7 @@ import Link from 'next/link'
 import AboutNav from '@/components/AboutNav'
 
 async function getTestimonials() {
-  const res = await fetch('http://localhost:3000/api/testimonials', { cache: 'no-store' })
+  const res = await fetch('/api/testimonials', { cache: 'no-store' })
   const data = await res.json()
   return Array.isArray(data) ? data : []
 }

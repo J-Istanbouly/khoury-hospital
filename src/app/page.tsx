@@ -5,7 +5,7 @@ import NewsSlider from '@/components/NewsSlider'
 import { QuickAccess, WhyChooseUs, DepartmentsGrid, FeaturedDoctors, Testimonials } from '@/components/HomeClient'
 
 async function getData() {
-  const base = 'http://localhost:3000'
+  const base = ''
   const [deptRes, newsRes, testiRes, heroRes, docRes] = await Promise.all([
     fetch(`${base}/api/departments`, { cache: 'no-store' }),
     fetch(`${base}/api/news`, { cache: 'no-store' }),

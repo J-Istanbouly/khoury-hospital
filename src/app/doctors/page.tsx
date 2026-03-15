@@ -3,8 +3,8 @@ import DoctorsClient from '@/components/DoctorsClient'
 
 async function getData() {
   const [doctorsRes, deptsRes] = await Promise.all([
-    fetch('http://localhost:3000/api/doctors', { cache: 'no-store' }),
-    fetch('http://localhost:3000/api/departments', { cache: 'no-store' }),
+    fetch('/api/doctors', { cache: 'no-store' }),
+    fetch('/api/departments', { cache: 'no-store' }),
   ])
   const doctors = await doctorsRes.json()
   const departments = await deptsRes.json()

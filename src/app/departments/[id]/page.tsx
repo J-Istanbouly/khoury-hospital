@@ -1,19 +1,19 @@
 import Link from 'next/link'
 
 async function getDepartment(id: string) {
-  const res = await fetch(`http://localhost:3000/api/departments`, { cache: 'no-store' })
+  const res = await fetch(`/api/departments`, { cache: 'no-store' })
   const data = await res.json()
   return Array.isArray(data) ? data.find((d: any) => d.id === id) : null
 }
 
 async function getDivisions(departmentId: string) {
-  const res = await fetch(`http://localhost:3000/api/divisions?department_id=${departmentId}`, { cache: 'no-store' })
+  const res = await fetch(`/api/divisions?department_id=${departmentId}`, { cache: 'no-store' })
   const data = await res.json()
   return Array.isArray(data) ? data : []
 }
 
 async function getDoctors(department: string) {
-  const res = await fetch(`http://localhost:3000/api/doctors`, { cache: 'no-store' })
+  const res = await fetch(`/api/doctors`, { cache: 'no-store' })
   const data = await res.json()
   return Array.isArray(data) ? data.filter((d: any) => d.department?.toLowerCase() === department?.toLowerCase()) : []
 }

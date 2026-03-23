@@ -6,7 +6,6 @@ export async function GET() {
   const { data, error } = await supabase
     .from('jobs')
     .select('*')
-    .eq('is_active', true)
     .order('created_at', { ascending: false })
 
   if (error) {

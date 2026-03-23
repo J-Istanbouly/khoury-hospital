@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import AboutNav from '@/components/AboutNav'
+import PageHero from '@/components/PageHero'
 
 async function getTestimonials() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/testimonials`, { cache: 'no-store' })
@@ -15,33 +16,36 @@ export default async function AboutPage() {
       <style>{`
         @media (max-width: 768px) {
           .ab-2 { grid-template-columns: 1fr !important; gap: 32px !important; }
-          .ab-3 { grid-template-columns: 1fr !important; }
-          .ab-4 { grid-template-columns: repeat(2,1fr) !important; }
+          .ab-3 { grid-template-columns: repeat(2, 1fr) !important; }
+          .ab-4 { grid-template-columns: repeat(2, 1fr) !important; }
           .ab-pad { padding: 48px 20px !important; }
           .ab-title { font-size: 28px !important; }
           .ab-hide { display: none !important; }
+
+          /* Leadership: 3 cards → first 2 normal, last one centered */
+          .ab-3-center { grid-template-columns: repeat(2, 1fr) !important; }
+          .ab-3-center > *:last-child:nth-child(odd) {
+            grid-column: 1 / -1;
+            max-width: 50%;
+            margin: 0 auto;
+            width: 100%;
+          }
         }
         @media (max-width: 480px) {
           .ab-4 { grid-template-columns: 1fr !important; }
+          .ab-3-center > *:last-child:nth-child(odd) {
+            max-width: 100%;
+          }
         }
       `}</style>
 
       {/* HERO */}
-      <section style={{ background: 'var(--blue-900)', padding: '80px 48px', position: 'relative', overflow: 'hidden' }} className="ab-pad">
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 70% 50%, rgba(45,125,210,0.2) 0%, transparent 70%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1160px', margin: '0 auto' }}>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '12px', fontFamily: 'Inter, sans-serif' }}>
-            <Link href="/" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Home</Link>
-            {' → '} About Us
-          </p>
-          <h1 className="ab-title" style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: '800', color: 'white', marginBottom: '16px' }}>
-            About Khoury General Hospital
-          </h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.65)', maxWidth: '560px', lineHeight: '1.8', fontFamily: 'Inter, sans-serif' }}>
-            A legacy of excellence, compassion, and innovation in healthcare since 1993
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title="About Khoury General Hospital"
+        subtitle="A legacy of excellence, compassion, and innovation in healthcare since 1993"
+        breadcrumb={[{ label: 'Home', href: '/' }, { label: 'About Us' }]}
+        badge="Est. 1993 · Category A"
+      />
 
       {/* QUICK NAV */}
       <div className="ab-hide">
@@ -98,7 +102,8 @@ export default async function AboutPage() {
             <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '2px', color: 'var(--blue-500)', marginBottom: '12px', textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>Our Purpose</p>
             <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: '700', color: 'var(--blue-900)' }}>Mission, Vision & Values</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }} className="ab-3">
+          {/* ab-3-center: 3 cards → 2+1 centered on mobile */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }} className="ab-3-center">
             {[
               { title: 'Our Mission', icon: '🎯', color: 'var(--blue-50)', accent: 'var(--blue-600)', text: 'To provide exceptional and compassionate healthcare, delivering high-quality, cost-effective services to the communities we serve. Through modern technology, beneficial relationships, and strict professional guidelines, we are dedicated to the care and improvement of human life.' },
               { title: 'Our Vision', icon: '🔭', color: '#f0fdf4', accent: '#15803d', text: 'To be the premier healthcare provider in the Bekaa region and beyond. We strive to become a leading hospital attracting patients from Lebanon and neighboring countries, offering the highest standard of care at reasonable prices.' },
@@ -153,10 +158,11 @@ export default async function AboutPage() {
             <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '2px', color: 'var(--blue-500)', marginBottom: '12px', textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>Our Team</p>
             <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: '700', color: 'var(--blue-900)' }}>Hospital Leadership</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }} className="ab-3">
+          {/* ab-3-center: last card centers itself when alone on a row */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }} className="ab-3-center">
             {[
               { name: 'H.E. Nicolas Khoury', role: 'Founder & Chairman', desc: 'The visionary founder of Khoury General Hospital. His Excellency established the hospital in 1993 with a mission to bring world-class healthcare to the Bekaa region.', initials: 'NK' },
-              { name: 'Georges Khoury', role: 'General Director', desc: 'Leading the hospital\'s day-to-day operations and long-term strategic direction, committed to continuous improvement and the highest standards of patient care.', initials: 'GK' },
+              { name: 'Georges Khoury', role: 'General Director', desc: "Leading the hospital's day-to-day operations and long-term strategic direction, committed to continuous improvement and the highest standards of patient care.", initials: 'GK' },
               { name: 'Medical Committee', role: 'Clinical Leadership', desc: 'A multidisciplinary team of senior physicians and department heads overseeing clinical protocols, patient safety, and medical quality across all 15+ departments.', initials: 'MC' },
             ].map((person) => (
               <div key={person.name} style={{ background: 'var(--gray-50)', borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--border)' }}>
@@ -208,6 +214,7 @@ export default async function AboutPage() {
             <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '2px', color: 'var(--blue-500)', marginBottom: '12px', textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>Our Difference</p>
             <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: '700', color: 'var(--blue-900)' }}>Why Choose Khoury General Hospital</h2>
           </div>
+          {/* ab-3: 6 cards = 3 rows of 2 on mobile — perfect! */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }} className="ab-3">
             {[
               { icon: '🏆', title: 'Category A Certified', desc: 'Accredited by the Lebanese Ministry of Health with the highest category rating for quality, safety, and patient care excellence.' },
@@ -237,7 +244,8 @@ export default async function AboutPage() {
               <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '2px', color: 'var(--blue-500)', marginBottom: '12px', textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>Patient Stories</p>
               <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: '700', color: 'var(--blue-900)' }}>What Our Patients Say</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }} className="ab-3">
+            {/* ab-3-center: 3 testimonials → 2+1 centered on mobile */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }} className="ab-3-center">
               {testimonials.slice(0, 3).map((t: any) => (
                 <div key={t.id} style={{ background: 'white', padding: '28px', borderRadius: 'var(--r-lg)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)' }}>
                   <div style={{ fontSize: '16px', marginBottom: '14px', color: '#F59E0B' }}>{'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}</div>

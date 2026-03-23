@@ -1,3 +1,4 @@
+import PageHero from '@/components/PageHero'
 import Link from 'next/link'
 
 export default function PatientsPage() {
@@ -20,18 +21,12 @@ export default function PatientsPage() {
       `}</style>
 
       {/* HERO */}
-      <section style={{ background: 'var(--blue-900)', padding: '80px 48px', position: 'relative', overflow: 'hidden' }} className="pt-pad">
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 70% 50%, rgba(45,125,210,0.2) 0%, transparent 70%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1160px', margin: '0 auto' }}>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }}>
-            <Link href="/" style={{ color: 'rgba(255,255,255,0.5)' }}>Home</Link> {' → '} Patients & Visitors
-          </p>
-          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: '700', color: 'white', marginBottom: '16px' }}>Patients & Visitors</h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.65)', maxWidth: '560px', lineHeight: '1.8' }}>
-            Everything you need to know before, during, and after your visit to Khoury General Hospital
-          </p>
-        </div>
-      </section>
+      <PageHero
+  title="Patients & Visitors"
+  subtitle="Everything you need to know before, during, and after your visit"
+  breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Patients & Visitors' }]}
+  badge="Patient Care"
+/>
 
       {/* QUICK ACCESS */}
       <section style={{ background: 'white', borderBottom: '1px solid var(--border)' }}>

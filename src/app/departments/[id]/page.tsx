@@ -175,7 +175,7 @@ export default async function DepartmentPage({ params }: { params: Promise<{ id:
                     <div style={{ padding: '16px' }}>
                       <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#004070', marginBottom: '4px' }}>{doc.name_en}</h4>
                       <p style={{ fontSize: '12px', color: '#005B99', fontWeight: '600', marginBottom: '12px' }}>{doc.title}</p>
-                      <Link href="/appointments" style={{ display: 'block', textAlign: 'center', padding: '8px', background: 'transparent', color: '#005B99', border: '1.5px solid #005B99', borderRadius: '6px', fontSize: '12px', fontWeight: '700', textDecoration: 'none' }}>
+                      <Link href={`/appointments?doctor=${doc.id}`} style={{ display: 'block', textAlign: 'center', padding: '8px', background: 'transparent', color: '#005B99', border: '1.5px solid #005B99', borderRadius: '6px', fontSize: '12px', fontWeight: '700', textDecoration: 'none' }}>
                         Book
                       </Link>
                     </div>

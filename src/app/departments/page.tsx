@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import DepartmentsFilter from '@/components/DepartmentsFilter'
+import PageHero from '@/components/PageHero'
 
 async function getDepartments() {
   const res = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/departments', { cache: 'no-store' })
@@ -20,21 +21,12 @@ export default async function DepartmentsPage() {
       `}</style>
 
       {/* HERO */}
-      <section style={{ background: 'var(--blue-900)', padding: '80px 48px', position: 'relative', overflow: 'hidden' }} className="dept-pad">
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 70% 50%, rgba(45,125,210,0.2) 0%, transparent 70%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1160px', margin: '0 auto' }}>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '12px', fontFamily: 'Inter, sans-serif' }}>
-            <Link href="/" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Home</Link>
-            {' → '} Departments
-          </p>
-          <h1 className="dept-title" style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: '700', color: 'white', marginBottom: '16px' }}>
-            Medical Departments
-          </h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.65)', maxWidth: '560px', lineHeight: '1.8', fontFamily: 'Inter, sans-serif' }}>
-            Khoury General Hospital offers comprehensive medical care across {departments.length}+ specialized departments
-          </p>
-        </div>
-      </section>
+      <PageHero
+  title="Medical Departments"
+  subtitle={`Comprehensive medical care across ${departments.length}+ specialized departments`}
+  breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Departments' }]}
+  badge="Our Specialties"
+/>
 
       <DepartmentsFilter departments={departments} />
 

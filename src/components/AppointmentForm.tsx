@@ -16,15 +16,21 @@ export default function AppointmentForm({ doctors, departments }: { doctors: any
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (doctorFromUrl && doctors.length > 0) {
+useEffect(() => {
+    if (doctorFromUrl && doctors.length > 0 && departments.length > 0) {
       const doc = doctors.find((d: any) => d.id === doctorFromUrl)
       if (doc) {
-        const dept = departments.find((dep: any) => dep.name_en?.toLowerCase() === doc.department?.toLowerCase())
-        setForm(f => ({ ...f, doctor_id: doctorFromUrl, department_id: dept?.id || '' }))
+        const dept = departments.find((dep: any) => 
+          dep.name_en?.toLowerCase().trim() === doc.department?.toLowerCase().trim()
+        )
+        setForm(f => ({ 
+          ...f, 
+          doctor_id: doctorFromUrl, 
+          department_id: dept?.id || '' 
+        }))
       }
     }
-  }, [doctorFromUrl, doctors, departments])
+  }, [doctorFromUrl, doctors.length, departments.length])
 
   const filteredDoctors = form.department_id
     ? doctors.filter((d: any) => {
@@ -142,7 +148,12 @@ export default function AppointmentForm({ doctors, departments }: { doctors: any
         <div className="af-2" style={{ marginBottom: '14px' }}>
           <div>
             <label style={lbl}>Department</label>
-            <select value={form.department_id} onChange={e => setForm({ ...form, department_id: e.target.value, doctor_id: preSelectedDoctor ? form.doctor_id : '' })} style={inp}>
+            <select 
+  value={form.department_id} 
+  onChange={e => setForm({ ...form, department_id: e.target.value, doctor_id: preSelectedDoctor ? form.doctor_id : '' })} 
+  style={{ ...inp, background: preSelectedDoctor ? 'var(--blue-50)' : 'white', color: preSelectedDoctor ? 'var(--blue-800)' : 'inherit' }}
+  disabled={!!preSelectedDoctor}
+>
               <option value="">Select Department</option>
               {departments.map((d: any) => <option key={d.id} value={d.id}>{d.name_en}</option>)}
             </select>

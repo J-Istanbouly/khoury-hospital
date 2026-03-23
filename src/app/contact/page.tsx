@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import ContactForm from '@/components/ContactForm'
+import PageHero from '@/components/PageHero'
 
 export default function ContactPage() {
   return (
@@ -21,18 +22,12 @@ export default function ContactPage() {
       `}</style>
 
       {/* HERO */}
-      <section style={{ background: 'var(--blue-900)', padding: '80px 48px', position: 'relative', overflow: 'hidden' }} className="ct-pad">
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 70% 50%, rgba(45,125,210,0.2) 0%, transparent 70%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1160px', margin: '0 auto' }}>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }}>
-            <Link href="/" style={{ color: 'rgba(255,255,255,0.5)' }}>Home</Link> {' → '} Contact Us
-          </p>
-          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: '700', color: 'white', marginBottom: '16px' }}>Contact Us</h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.65)', maxWidth: '560px', lineHeight: '1.8' }}>
-            We're here to help. Reach out for inquiries, appointments, or general information.
-          </p>
-        </div>
-      </section>
+      <PageHero
+  title="Contact Us"
+  subtitle="We're here to help with any inquiries or appointments"
+  breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Contact Us' }]}
+  badge="Get In Touch"
+/>
 
       {/* INFO STRIP */}
       <section style={{ background: 'white', borderBottom: '1px solid var(--border)' }}>

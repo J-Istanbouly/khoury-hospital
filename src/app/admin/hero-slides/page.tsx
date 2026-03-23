@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Cropper from 'react-easy-crop'
 
+const BASE = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+
 const PAGES = [
   { label: 'Home', value: '/' },
   { label: 'About', value: '/about' },
@@ -22,6 +24,8 @@ export default function AdminHeroSlides() {
   const [showModal, setShowModal] = useState(false)
   const [editing, setEditing] = useState<any>(null)
   const [saving, setSaving] = useState(false)
+  const [toast, setToast] = useState<{ msg: string, type: 'success' | 'error' } | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<any>(null)
   const [mediaPreview, setMediaPreview] = useState('')
   const [mediaFile, setMediaFile] = useState<File | null>(null)
   const [mediaType, setMediaType] = useState<'image' | 'video'>('image')
@@ -35,6 +39,11 @@ export default function AdminHeroSlides() {
   const empty = { title: '', subtitle: '', button_text: '', button_link: '/', media_url: '', media_type: 'image', is_active: true }
   const [form, setForm] = useState(empty)
 
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ msg, type })
+    setTimeout(() => setToast(null), 3000)
+  }
+
   useEffect(() => {
     if (!localStorage.getItem('isAdmin')) { router.push('/admin/login'); return }
     fetchAll()
@@ -42,7 +51,8 @@ export default function AdminHeroSlides() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const data = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/hero-slides').then(r => r.json())
+    // Use /all to get ALL slides including inactive
+    const data = await fetch(`${BASE}/api/hero-slides/all`).then(r => r.json())
     setSlides(Array.isArray(data) ? data.sort((a: any, b: any) => (a.order_num || 0) - (b.order_num || 0)) : [])
     setLoading(false)
   }
@@ -50,7 +60,15 @@ export default function AdminHeroSlides() {
   const openAdd = () => { setEditing(null); setForm(empty); setMediaPreview(''); setMediaFile(null); setMediaType('image'); setShowModal(true) }
   const openEdit = (item: any) => {
     setEditing(item)
-    setForm({ ...empty, ...item })
+    setForm({
+      title: item.title || '',
+      subtitle: item.subtitle || '',
+      button_text: item.button_text || '',
+      button_link: item.button_link || '/',
+      media_url: item.media_url || '',
+      media_type: item.media_type || 'image',
+      is_active: item.is_active !== false,
+    })
     setMediaPreview(item.media_url || '')
     setMediaType(item.media_type === 'video' ? 'video' : 'image')
     setMediaFile(null)
@@ -67,12 +85,15 @@ export default function AdminHeroSlides() {
     } else {
       setMediaType('image')
       setCropSrc(URL.createObjectURL(f))
+      setShowModal(false)
       setShowCrop(true)
     }
+    e.target.value = ''
   }
 
   const getCroppedImg = async () => {
     const image = new Image()
+    image.crossOrigin = 'anonymous'
     image.src = cropSrc
     await new Promise(r => { image.onload = r })
     const canvas = document.createElement('canvas')
@@ -89,35 +110,63 @@ export default function AdminHeroSlides() {
     setMediaFile(file)
     setMediaPreview(URL.createObjectURL(file))
     setShowCrop(false)
+    setShowModal(true)
   }
 
   const uploadMedia = async () => {
     if (!mediaFile) return form.media_url || ''
-    const fd = new FormData(); fd.append('file', mediaFile)
-    const res = await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/upload', { method: 'POST', body: fd })
-    if (!res.ok) return form.media_url || ''
-    const data = await res.json(); return data.url || ''
+    const fd = new FormData()
+    fd.append('file', mediaFile)
+    try {
+      const res = await fetch(`${BASE}/api/upload`, { method: 'POST', body: fd })
+      if (!res.ok) return form.media_url || ''
+      const data = await res.json()
+      return data.url || form.media_url || ''
+    } catch {
+      return form.media_url || ''
+    }
   }
 
   const handleSave = async () => {
     setSaving(true)
-    const media_url = await uploadMedia()
-    const payload = { ...form, media_url, media_type: mediaType }
-    if (editing) {
-      await fetch(`/api/hero-slides/${editing.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-    } else {
-      await fetch((process.env.NEXT_PUBLIC_BASE_URL||'http://localhost:3000')+'/api/hero-slides', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+    try {
+      const media_url = await uploadMedia()
+      const payload = { ...form, media_url, media_type: mediaType }
+      if (editing) {
+        await fetch(`${BASE}/api/hero-slides/${editing.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        showToast('✅ Slide updated successfully!')
+      } else {
+        await fetch(`${BASE}/api/hero-slides`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        showToast('✅ Slide added successfully!')
+      }
+      setShowModal(false)
+      fetchAll()
+    } catch {
+      showToast('Something went wrong', 'error')
     }
-    setSaving(false); setShowModal(false); fetchAll()
+    setSaving(false)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this slide?')) return
-    await fetch(`/api/hero-slides/${id}`, { method: 'DELETE' }); fetchAll()
+  const handleDelete = async () => {
+    if (!confirmDelete) return
+    try {
+      await fetch(`${BASE}/api/hero-slides/${confirmDelete.id}`, { method: 'DELETE' })
+      setConfirmDelete(null)
+      showToast('✅ Slide deleted successfully!')
+      fetchAll()
+    } catch {
+      showToast('Failed to delete', 'error')
+    }
   }
 
   const toggleActive = async (id: string, val: boolean) => {
-    await fetch(`/api/hero-slides/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ is_active: val }) }); fetchAll()
+    try {
+      await fetch(`${BASE}/api/hero-slides/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ is_active: val }) })
+      showToast(val ? '✅ Slide activated!' : '✅ Slide deactivated!')
+      fetchAll()
+    } catch {
+      showToast('Failed to update', 'error')
+    }
   }
 
   const inp: React.CSSProperties = { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '13px', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' }
@@ -129,8 +178,10 @@ export default function AdminHeroSlides() {
         .hs-wrap { padding: 32px 40px; }
         .hs-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
         .hs-form-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-        .adm-modal { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px; }
+        .adm-modal { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px; }
         .adm-modal-box { background:white; border-radius:16px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; }
+        .adm-toast { position:fixed; top:24px; right:24px; z-index:9999; padding:14px 20px; border-radius:12px; font-size:14px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,0.15); animation:slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform:translateX(100px); opacity:0; } to { transform:translateX(0); opacity:1; } }
         @media (max-width:1024px) { .hs-grid { grid-template-columns:repeat(2,1fr) !important; } }
         @media (max-width:768px) {
           .hs-wrap { padding:16px !important; }
@@ -139,11 +190,18 @@ export default function AdminHeroSlides() {
         }
       `}</style>
 
+      {/* TOAST */}
+      {toast && (
+        <div className="adm-toast" style={{ background: toast.type === 'success' ? '#dcfce7' : '#fee2e2', color: toast.type === 'success' ? '#15803d' : '#dc2626' }}>
+          {toast.msg}
+        </div>
+      )}
+
       <div className="hs-wrap">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <button onClick={() => router.push('/admin/dashboard')} style={{ background: 'none', border: 'none', color: '#005B99', cursor: 'pointer', fontSize: '14px', fontWeight: '600', padding: 0, marginBottom: '6px', display: 'block' }}>← Dashboard</button>
-            <h1 style={{ color: '#004070', fontSize: 'clamp(18px,3vw,24px)', margin: 0, fontFamily: 'Playfair Display, serif' }}>Hero Slides</h1>
+            <h1 style={{ color: '#004070', fontSize: 'clamp(18px,3vw,24px)', margin: 0, fontFamily: 'Playfair Display, serif' }}>Hero Slides ({slides.length})</h1>
           </div>
           <button onClick={openAdd} style={{ padding: '10px 20px', background: '#005B99', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '14px', cursor: 'pointer' }}>+ Add Slide</button>
         </div>
@@ -153,8 +211,7 @@ export default function AdminHeroSlides() {
           : (
             <div className="hs-grid">
               {slides.map((slide: any) => (
-                <div key={slide.id} style={{ background: 'white', borderRadius: '14px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                  {/* PREVIEW */}
+                <div key={slide.id} style={{ background: 'white', borderRadius: '14px', overflow: 'hidden', border: `2px solid ${slide.is_active ? '#e2e8f0' : '#fca5a5'}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                   <div style={{ height: '140px', background: '#0A2540', position: 'relative', overflow: 'hidden' }}>
                     {slide.media_url && slide.media_type === 'video'
                       ? <video src={slide.media_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted />
@@ -163,28 +220,27 @@ export default function AdminHeroSlides() {
                         : <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #0A2540, #1F6AA5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>🖼️</div>
                     }
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '14px' }}>
-                      <h3 style={{ color: 'white', fontFamily: 'Playfair Display, serif', fontSize: '14px', fontWeight: '700', margin: '0 0 4px', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{slide.title || 'No Title'}</h3>
-                      {slide.subtitle && <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '11px', margin: 0, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{slide.subtitle}</p>}
+                      <h3 style={{ color: 'white', fontFamily: 'Playfair Display, serif', fontSize: '14px', fontWeight: '700', margin: '0 0 4px' }}>{slide.title || 'No Title'}</h3>
+                      {slide.subtitle && <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '11px', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{slide.subtitle}</p>}
                     </div>
-                    {slide.media_type === 'video' && (
-                      <div style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px' }}>VIDEO</div>
-                    )}
-                    {!slide.is_active && (
-                      <div style={{ position: 'absolute', top: '8px', left: '8px', background: '#dc2626', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px' }}>INACTIVE</div>
-                    )}
+                    <div style={{ position: 'absolute', top: '8px', right: '8px', display: 'flex', gap: '4px' }}>
+                      {slide.media_type === 'video' && <span style={{ background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px' }}>VIDEO</span>}
+                      {!slide.is_active && <span style={{ background: '#dc2626', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px' }}>⏸ INACTIVE</span>}
+                      {slide.is_active && <span style={{ background: '#15803d', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px' }}>✓ ACTIVE</span>}
+                    </div>
                   </div>
-
                   <div style={{ padding: '14px' }}>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
                       {slide.button_text && <span style={{ background: '#eff6ff', color: '#1d4ed8', fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px' }}>🔗 {slide.button_text}</span>}
                       {slide.button_link && <span style={{ background: '#f1f5f9', color: '#64748b', fontSize: '11px', padding: '2px 8px', borderRadius: '20px' }}>{slide.button_link}</span>}
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      <button onClick={() => openEdit(slide)} style={{ flex: 1, padding: '8px', background: '#eff6ff', color: '#005B99', border: 'none', borderRadius: '8px', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>Edit</button>
-                      <button onClick={() => toggleActive(slide.id, !slide.is_active)} style={{ flex: 1, padding: '8px', background: slide.is_active ? '#fef9c3' : '#dcfce7', color: slide.is_active ? '#ca8a04' : '#15803d', border: 'none', borderRadius: '8px', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>
-                        {slide.is_active ? 'Deactivate' : 'Activate'}
+                      <button onClick={() => openEdit(slide)} style={{ flex: 1, padding: '8px', background: '#eff6ff', color: '#005B99', border: 'none', borderRadius: '8px', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>✏️ Edit</button>
+                      <button onClick={() => toggleActive(slide.id, !slide.is_active)}
+                        style={{ flex: 1, padding: '8px', background: slide.is_active ? '#fef9c3' : '#dcfce7', color: slide.is_active ? '#ca8a04' : '#15803d', border: 'none', borderRadius: '8px', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>
+                        {slide.is_active ? '⏸ Deactivate' : '▶ Activate'}
                       </button>
-                      <button onClick={() => handleDelete(slide.id)} style={{ padding: '8px 12px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '8px', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>🗑</button>
+                      <button onClick={() => setConfirmDelete(slide)} style={{ padding: '8px 12px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '8px', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>🗑</button>
                     </div>
                   </div>
                 </div>
@@ -192,6 +248,23 @@ export default function AdminHeroSlides() {
             </div>
           )}
       </div>
+
+      {/* CONFIRM DELETE */}
+      {confirmDelete && (
+        <div className="adm-modal">
+          <div style={{ background: 'white', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🗑️</div>
+            <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '20px', color: '#004070', marginBottom: '10px' }}>Delete Slide?</h3>
+            <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px', lineHeight: '1.6' }}>
+              Are you sure you want to delete <strong>"{confirmDelete.title || 'this slide'}"</strong>? This cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button onClick={() => setConfirmDelete(null)} style={{ flex: 1, padding: '12px', background: '#f1f5f9', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '14px' }}>Cancel</button>
+              <button onClick={handleDelete} style={{ flex: 1, padding: '12px', background: '#dc2626', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '700', cursor: 'pointer', fontSize: '14px' }}>Yes, Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CROP MODAL */}
       {showCrop && (
@@ -203,8 +276,8 @@ export default function AdminHeroSlides() {
             </div>
             <input type="range" min={1} max={3} step={0.1} value={zoom} onChange={e => setZoom(Number(e.target.value))} style={{ width: '100%', marginBottom: '14px' }} />
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => setShowCrop(false)} style={{ flex: 1, padding: '10px', background: '#f1f5f9', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={confirmCrop} style={{ flex: 1, padding: '10px', background: '#005B99', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Confirm</button>
+              <button onClick={() => { setShowCrop(false); setShowModal(true) }} style={{ flex: 1, padding: '10px', background: '#f1f5f9', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={confirmCrop} style={{ flex: 1, padding: '10px', background: '#005B99', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Confirm Crop</button>
             </div>
           </div>
         </div>
@@ -219,7 +292,6 @@ export default function AdminHeroSlides() {
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
             </div>
             <div style={{ padding: '20px 22px' }}>
-              {/* MEDIA UPLOAD */}
               <div style={{ marginBottom: '18px' }}>
                 <label style={lbl}>Media (Image or Video)</label>
                 <div style={{ height: '140px', background: '#0A2540', borderRadius: '10px', overflow: 'hidden', marginBottom: '10px', position: 'relative', cursor: 'pointer' }} onClick={() => fileRef.current?.click()}>
@@ -235,7 +307,7 @@ export default function AdminHeroSlides() {
                 </div>
                 <input type="file" ref={fileRef} accept="image/*,video/*" onChange={handleFile} style={{ display: 'none' }} />
                 <button onClick={() => fileRef.current?.click()} style={{ width: '100%', padding: '9px', background: '#f1f5f9', border: '1.5px dashed #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', color: '#64748b' }}>
-                  {mediaPreview ? 'Change Media' : '+ Upload Image / Video'}
+                  {mediaPreview ? '📷 Change Media' : '+ Upload Image / Video'}
                 </button>
               </div>
 
@@ -262,14 +334,15 @@ export default function AdminHeroSlides() {
 
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: '#334155' }}>
-                  <input type="checkbox" checked={form.is_active} onChange={e => setForm({ ...form, is_active: e.target.checked })} /> Active (visible on homepage)
+                  <input type="checkbox" checked={form.is_active} onChange={e => setForm({ ...form, is_active: e.target.checked })} />
+                  Active — visible on homepage
                 </label>
               </div>
 
               <div style={{ display: 'flex', gap: '10px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
                 <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: '11px', background: '#f1f5f9', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '14px' }}>Cancel</button>
                 <button onClick={handleSave} disabled={saving} style={{ flex: 1, padding: '11px', background: saving ? '#94a3b8' : '#005B99', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer', fontSize: '14px' }}>
-                  {saving ? 'Saving...' : editing ? 'Save Changes' : 'Add Slide'}
+                  {saving ? '⏳ Saving...' : editing ? '✓ Save Changes' : '+ Add Slide'}
                 </button>
               </div>
             </div>

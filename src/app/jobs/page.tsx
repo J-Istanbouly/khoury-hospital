@@ -1,3 +1,4 @@
+import PageHero from '@/components/PageHero'
 import Link from 'next/link'
 
 async function getJobs() {
@@ -34,18 +35,12 @@ export default async function JobsPage() {
       `}</style>
 
       {/* HERO */}
-      <section style={{ background: 'var(--blue-900)', padding: '80px 48px', position: 'relative', overflow: 'hidden' }} className="jobs-pad">
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 70% 50%, rgba(45,125,210,0.2) 0%, transparent 70%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1160px', margin: '0 auto' }}>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }}>
-            <Link href="/" style={{ color: 'rgba(255,255,255,0.5)' }}>Home</Link> {' → '} Careers
-          </p>
-          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: '700', color: 'white', marginBottom: '16px' }}>Join Our Team</h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.65)', maxWidth: '560px', lineHeight: '1.8' }}>
-            Be part of a team dedicated to excellence in healthcare. We're always looking for talented professionals.
-          </p>
-        </div>
-      </section>
+      <PageHero
+  title="Join Our Team"
+  subtitle="Be part of a team dedicated to excellence in healthcare"
+  breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Careers' }]}
+  badge="We're Hiring"
+/>
 
       {/* WHY JOIN */}
       <section style={{ padding: '80px 48px', background: 'white' }} className="jobs-pad">

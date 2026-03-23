@@ -16,21 +16,21 @@ export function QuickAccess() {
         .qa-item:hover { background: var(--blue-50); }
         @media (max-width: 768px) {
           .qa-grid { grid-template-columns: repeat(2,1fr) !important; }
-          .qa-item { padding: 16px 18px; }
-        }
-        @media (max-width: 400px) {
-          .qa-grid { grid-template-columns: 1fr !important; }
+          .qa-item { padding: 14px 16px; gap: 10px; }
+          .qa-item-icon { width: 38px !important; height: 38px !important; font-size: 16px !important; }
+          .qa-item-title { font-size: 13px !important; }
+          .qa-item-desc { display: none; }
         }
       `}</style>
       <div style={{ maxWidth: 'var(--max-w)', margin: '0 auto' }} className="qa-grid">
         {items.map((item, i) => (
           <a key={i} href={item.href} className="qa-item">
-            <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: item.accent, border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
+            <div className="qa-item-icon" style={{ width: '46px', height: '46px', borderRadius: '12px', background: item.accent, border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
               {item.icon}
             </div>
             <div>
-              <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: '700', color: 'var(--blue-800)', fontSize: '14px', marginBottom: '2px' }}>{item.title}</div>
-              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', color: 'var(--gray-400)' }}>{item.desc}</div>
+              <div className="qa-item-title" style={{ fontFamily: 'Inter, sans-serif', fontWeight: '700', color: 'var(--blue-800)', fontSize: '14px', marginBottom: '2px' }}>{item.title}</div>
+              <div className="qa-item-desc" style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', color: 'var(--gray-400)' }}>{item.desc}</div>
             </div>
           </a>
         ))}
@@ -51,26 +51,34 @@ export function WhyChooseUs() {
   return (
     <section style={{ padding: '80px 48px', background: 'var(--gray-50)' }}>
       <style>{`
+        .why-wrap { max-width: var(--max-w); margin: 0 auto; }
         .why-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
         @media (max-width: 1024px) { .why-grid { grid-template-columns:repeat(2,1fr) !important; } }
-        @media (max-width: 640px) { .why-grid { grid-template-columns:1fr !important; } .why-pad { padding:40px 20px !important; } }
+        @media (max-width: 768px) {
+          .why-section { padding: 40px 16px !important; }
+          .why-grid { grid-template-columns:repeat(2,1fr) !important; gap: 12px !important; }
+          .why-card { padding: 18px !important; }
+          .why-icon { width: 42px !important; height: 42px !important; font-size: 20px !important; margin-bottom: 10px !important; }
+          .why-title { font-size: 14px !important; margin-bottom: 6px !important; }
+          .why-desc { font-size: 12px !important; }
+        }
       `}</style>
-      <div style={{ maxWidth: 'var(--max-w)', margin: '0 auto' }} className="why-pad">
+      <div className="why-wrap why-section" style={{ padding: '80px 48px' }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div className="label" style={{ justifyContent: 'center' }}>Why Choose Us</div>
           <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(26px,4vw,42px)', fontWeight: '700', color: 'var(--blue-900)' }}>The Khoury Difference</h2>
         </div>
         <div className="why-grid">
           {items.map((item, i) => (
-            <div key={i} style={{ background: 'white', borderRadius: 'var(--r-lg)', padding: '28px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)', transition: 'all 0.25s' }}
+            <div key={i} className="why-card" style={{ background: 'white', borderRadius: 'var(--r-lg)', padding: '28px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)', transition: 'all 0.25s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-xs)' }}
             >
-              <div style={{ width: '52px', height: '52px', borderRadius: '13px', background: item.color, border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', marginBottom: '16px' }}>
+              <div className="why-icon" style={{ width: '52px', height: '52px', borderRadius: '13px', background: item.color, border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', marginBottom: '16px' }}>
                 {item.icon}
               </div>
-              <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '18px', fontWeight: '700', color: 'var(--blue-800)', marginBottom: '8px' }}>{item.title}</h3>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '13px', color: 'var(--gray-500)', lineHeight: '1.75' }}>{item.desc}</p>
+              <h3 className="why-title" style={{ fontFamily: 'Playfair Display, serif', fontSize: '18px', fontWeight: '700', color: 'var(--blue-800)', marginBottom: '8px' }}>{item.title}</h3>
+              <p className="why-desc" style={{ fontFamily: 'Inter, sans-serif', fontSize: '13px', color: 'var(--gray-500)', lineHeight: '1.75' }}>{item.desc}</p>
             </div>
           ))}
         </div>
@@ -84,12 +92,19 @@ export function DepartmentsGrid({ departments }: { departments: any[] }) {
   return (
     <section style={{ padding: '80px 48px', background: 'white' }}>
       <style>{`
+        .dept-wrap { max-width: var(--max-w); margin: 0 auto; }
         .dept-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
         @media (max-width: 1024px) { .dept-grid { grid-template-columns:repeat(3,1fr) !important; } }
-        @media (max-width: 768px) { .dept-grid { grid-template-columns:repeat(2,1fr) !important; } .dept-pad { padding:40px 20px !important; } }
-        @media (max-width: 400px) { .dept-grid { grid-template-columns:1fr !important; } }
+        @media (max-width: 768px) {
+          .dept-section { padding: 40px 16px !important; }
+          .dept-grid { grid-template-columns:repeat(2,1fr) !important; gap: 10px !important; }
+          .dept-card { padding: 16px 14px !important; }
+          .dept-icon { font-size: 22px !important; margin-bottom: 8px !important; }
+          .dept-name { font-size: 13px !important; }
+          .dept-loc { display: none !important; }
+        }
       `}</style>
-      <div style={{ maxWidth: 'var(--max-w)', margin: '0 auto' }} className="dept-pad">
+      <div className="dept-wrap dept-section" style={{ padding: '80px 48px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '44px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div className="label">Medical Services</div>
@@ -100,13 +115,13 @@ export function DepartmentsGrid({ departments }: { departments: any[] }) {
         <div className="dept-grid">
           {departments.slice(0, 8).map((dept: any) => (
             <Link key={dept.id} href={`/departments/${dept.id}`} style={{ textDecoration: 'none' }}>
-              <div style={{ background: 'var(--gray-50)', borderRadius: 'var(--r-lg)', padding: '22px 18px', border: '1px solid var(--border)', height: '100%', transition: 'all 0.25s', cursor: 'pointer' }}
+              <div className="dept-card" style={{ background: 'var(--gray-50)', borderRadius: 'var(--r-lg)', padding: '22px 18px', border: '1px solid var(--border)', height: '100%', transition: 'all 0.25s', cursor: 'pointer' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--blue-50)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--blue-100)' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--gray-50)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)' }}
               >
-                <div style={{ fontSize: '28px', marginBottom: '12px' }}>{dept.icon || '⚕️'}</div>
-                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '15px', fontWeight: '600', color: 'var(--blue-800)', marginBottom: '6px', lineHeight: '1.3' }}>{dept.name_en}</h3>
-                {dept.location && <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '11px', color: 'var(--gray-400)', marginBottom: '10px' }}>📍 {dept.location}</div>}
+                <div className="dept-icon" style={{ fontSize: '28px', marginBottom: '12px' }}>{dept.icon || '⚕️'}</div>
+                <h3 className="dept-name" style={{ fontFamily: 'Playfair Display, serif', fontSize: '15px', fontWeight: '600', color: 'var(--blue-800)', marginBottom: '6px', lineHeight: '1.3' }}>{dept.name_en}</h3>
+                {dept.location && <div className="dept-loc" style={{ fontFamily: 'Inter, sans-serif', fontSize: '11px', color: 'var(--gray-400)', marginBottom: '10px' }}>📍 {dept.location}</div>}
                 <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', color: 'var(--blue-500)', fontWeight: '600' }}>Learn More →</div>
               </div>
             </Link>
@@ -122,11 +137,19 @@ export function FeaturedDoctors({ doctors }: { doctors: any[] }) {
   return (
     <section style={{ padding: '80px 48px', background: 'var(--gray-50)' }}>
       <style>{`
+        .doc-wrap { max-width: var(--max-w); margin: 0 auto; }
         .feat-doc-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
         @media (max-width: 1024px) { .feat-doc-grid { grid-template-columns:repeat(2,1fr) !important; } }
-        @media (max-width: 640px) { .feat-doc-grid { grid-template-columns:repeat(2,1fr) !important; } .feat-doc-pad { padding:40px 20px !important; } }
+        @media (max-width: 768px) {
+          .doc-section { padding: 40px 16px !important; }
+          .feat-doc-grid { grid-template-columns:repeat(2,1fr) !important; gap: 12px !important; }
+          .doc-avatar { width: 68px !important; height: 68px !important; }
+          .doc-name { font-size: 13px !important; }
+          .doc-title { font-size: 11px !important; }
+          .doc-btn { font-size: 11px !important; padding: 8px 10px !important; }
+        }
       `}</style>
-      <div style={{ maxWidth: 'var(--max-w)', margin: '0 auto' }} className="feat-doc-pad">
+      <div className="doc-wrap doc-section" style={{ padding: '80px 48px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '44px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div className="label">Our Specialists</div>
@@ -141,14 +164,14 @@ export function FeaturedDoctors({ doctors }: { doctors: any[] }) {
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-xs)' }}
             >
               <div style={{ padding: '24px 20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ width: '88px', height: '88px', borderRadius: '50%', overflow: 'hidden', border: '3px solid var(--blue-100)', background: 'var(--blue-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px', flexShrink: 0 }}>
+                <div className="doc-avatar" style={{ width: '88px', height: '88px', borderRadius: '50%', overflow: 'hidden', border: '3px solid var(--blue-100)', background: 'var(--blue-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px', flexShrink: 0 }}>
                   {doc.image_url
                     ? <img src={doc.image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={doc.name_en} />
                     : <div style={{ fontSize: '36px', opacity: 0.3 }}>👨‍⚕️</div>
                   }
                 </div>
-                <h4 style={{ fontFamily: 'Playfair Display, serif', fontSize: '15px', fontWeight: '600', color: 'var(--blue-900)', marginBottom: '4px', lineHeight: '1.3' }}>{doc.name_en}</h4>
-                {doc.title && <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', color: 'var(--blue-500)', fontWeight: '500', marginBottom: '8px' }}>{doc.title}</p>}
+                <h4 className="doc-name" style={{ fontFamily: 'Playfair Display, serif', fontSize: '15px', fontWeight: '600', color: 'var(--blue-900)', marginBottom: '4px', lineHeight: '1.3' }}>{doc.name_en}</h4>
+                {doc.title && <p className="doc-title" style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', color: 'var(--blue-500)', fontWeight: '500', marginBottom: '8px' }}>{doc.title}</p>}
                 {doc.department && (
                   <span style={{ background: 'var(--blue-50)', color: 'var(--blue-700)', fontSize: '11px', fontWeight: '600', padding: '3px 10px', borderRadius: '20px', border: '1px solid var(--blue-100)', fontFamily: 'Inter, sans-serif' }}>
                     {doc.department}
@@ -156,7 +179,7 @@ export function FeaturedDoctors({ doctors }: { doctors: any[] }) {
                 )}
               </div>
               <div style={{ padding: '0 16px 18px' }}>
-                <Link href="/appointments" className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: '12px', padding: '9px 12px', display: 'flex' }}>
+                <Link href={`/appointments?doctor=${doc.id}`} className="btn-primary doc-btn" style={{ width: '100%', justifyContent: 'center', fontSize: '12px', padding: '9px 12px', display: 'flex' }}>
                   Book Appointment
                 </Link>
               </div>
@@ -173,19 +196,24 @@ export function Testimonials({ testimonials }: { testimonials: any[] }) {
   return (
     <section style={{ padding: '80px 48px', background: 'var(--blue-900)', position: 'relative', overflow: 'hidden' }}>
       <style>{`
+        .testi-wrap { max-width: var(--max-w); margin: 0 auto; position: relative; z-index: 2; }
         .testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
         @media (max-width: 1024px) { .testi-grid { grid-template-columns:repeat(2,1fr) !important; } }
-        @media (max-width: 640px) { .testi-grid { grid-template-columns:1fr !important; } .testi-pad { padding:40px 20px !important; } }
+        @media (max-width: 768px) {
+          .testi-section { padding: 40px 16px !important; }
+          .testi-grid { grid-template-columns:1fr !important; gap: 14px !important; }
+          .testi-card { padding: 20px !important; }
+        }
       `}</style>
       <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'rgba(46,134,193,0.08)' }} />
-      <div style={{ maxWidth: 'var(--max-w)', margin: '0 auto', position: 'relative', zIndex: 2 }} className="testi-pad">
+      <div className="testi-wrap testi-section" style={{ padding: '80px 48px' }}>
         <div style={{ textAlign: 'center', marginBottom: '52px' }}>
           <div className="label" style={{ justifyContent: 'center', color: 'var(--blue-400)' }}>Patient Stories</div>
           <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(26px,4vw,42px)', fontWeight: '700', color: 'white' }}>What Our Patients Say</h2>
         </div>
         <div className="testi-grid">
           {testimonials.slice(0, 3).map((t: any) => (
-            <div key={t.id} style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(12px)', borderRadius: 'var(--r-lg)', padding: '28px', border: '1px solid rgba(255,255,255,0.1)', transition: 'background 0.25s' }}
+            <div key={t.id} className="testi-card" style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(12px)', borderRadius: 'var(--r-lg)', padding: '28px', border: '1px solid rgba(255,255,255,0.1)', transition: 'background 0.25s' }}
               onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.11)'}
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'}
             >

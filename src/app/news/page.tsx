@@ -1,3 +1,4 @@
+import PageHero from '@/components/PageHero'
 import Link from 'next/link'
 
 async function getNews() {
@@ -32,18 +33,12 @@ export default async function NewsPage() {
       `}</style>
 
       {/* HERO */}
-      <section style={{ background: 'var(--blue-900)', padding: '80px 48px', position: 'relative', overflow: 'hidden' }} className="news-hero">
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 70% 50%, rgba(45,125,210,0.2) 0%, transparent 70%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1160px', margin: '0 auto' }}>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }}>
-            <Link href="/" style={{ color: 'rgba(255,255,255,0.5)' }}>Home</Link> {' → '} News & Events
-          </p>
-          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: '700', color: 'white', marginBottom: '16px' }}>News & Events</h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.65)', maxWidth: '560px', lineHeight: '1.8' }}>
-            Stay updated with the latest news, events, and achievements from Khoury General Hospital
-          </p>
-        </div>
-      </section>
+      <PageHero
+  title="News & Events"
+  subtitle="Stay updated with the latest news and achievements from Khoury General Hospital"
+  breadcrumb={[{ label: 'Home', href: '/' }, { label: 'News & Events' }]}
+  badge="Latest Updates"
+/>
 
       {/* FEATURED */}
       {featured.length > 0 && (

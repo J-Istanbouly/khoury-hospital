@@ -1,22 +1,23 @@
-import ConditionalLayout from '@/components/ConditionalLayout'
+import type { Metadata } from 'next'
 import './global.css'
+import ConditionalLayout from '@/components/ConditionalLayout'
+import { LanguageProvider } from '@/lib/lang/LanguageContext'
 
-export const metadata = {
-  title: 'Khoury General Hospital — Zahle, Lebanon',
-  description: 'Providing exceptional healthcare to the Bekaa region since 1993.',
-  icons: {
-    icon: '/logo.jpg',
-    apple: '/logo.jpg',
-  },
+export const metadata: Metadata = {
+  title: 'Khoury General Hospital',
+  description: 'Excellence in Healthcare Since 1993 — Zahle, Bekaa, Lebanon',
+  icons: { icon: '/logo.jpg', apple: '/logo.jpg' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <ConditionalLayout>
-          {children}
-        </ConditionalLayout>
+        <LanguageProvider>
+          <ConditionalLayout>
+            {children}
+          </ConditionalLayout>
+        </LanguageProvider>
       </body>
     </html>
   )
